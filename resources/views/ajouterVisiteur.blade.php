@@ -1,38 +1,40 @@
-@extends ('sommaire')
+@extends ('sommaireG')
 @section('contenu1')
-
 <div id="contenu">
-    <h2>Ajouter un visiteur</h2>
-    <form method="post"  action="{{ route('chemin_ajouterVisiteur') }}">
-                    {{ csrf_field() }} <!-- laravel va ajouter un champ caché avec un token -->
-        <div class="corpsForm">
-            <fieldset>
-                <p>
-                    <label for="id">Id :</label>
-                    <input type="text" name="id" value="id"><BR>
-                    <label for="name">Nom :</label>
-                    <input type="text" name="nom" value="nom"><BR>
-                    <label for="prenom">Prenom:</label>
-                    <input type="text" name="prenom" value="prenom"><BR>
-                    <label for="log">Login :</label>
-                    <input type="text" name="login" value="login"><BR>
-                    <label for="ad">Adresse :</label>
-                    <input type="text" name="adresse" value="adresse"><BR>
-                    <label for="cpl">CP :</label>
-                    <input type="text" name="cp" value="cp"><BR>
-                    <label for="vi">Ville :</label>
-                    <input type="text" name="ville" value="ville"><BR>
-                    <label for="date">Date d'Embauche :</label>
-                    <input type="text" name="dateEmb" value="dateEmb"><BR>
-                              
-                </p>
-            </fieldset>
-        </div>
-        <div class="piedForm">
-            <p>
-            <input id="ok" type="submit" value="Valider" size="20" />
-            <input id="annuler" type="reset" value="Annuler" size="20" />
-            </p> 
-        </div>
-    </form>
+
+
+<h3>Formulaire d'ajout de visiteur.</h3>
+<!-- Ajoutez cette ligne pour inclure le jeton CSRF -->
+
+
+<form action="{{Route('chemin_ajouterVisiteur')}}" method="post">
+@csrf
+ <label for="nom">Nom</label>
+ <input type="text" name="nom" id="nom" required/><br><br>
+ <label for="prenom">Prenom</label>
+ <input type="text"  name="prenom" id="prenom" required/><br><br>
+ <label for="login">Login</label>
+ <input type="text" name="login" id="login" required/><br><br>
+ <label for="mdp">mdp</label>
+ <input type="password" name="mdp" id="mdp" required/><br><br>
+ <label for="adresse">Adresse</label>
+ <input type="text" name="adresse" id="adresse" required/><br><br>
+ <label for="cp">CP</label>
+ <input type="text" name="cp"  id="cp" required/><br><br>
+ <label for="ville">ville</label> 
+ <input type="text" name="ville" id="ville" required/><br><br>   
+ <label for="dateEmbauche">dateEmbauche</label>
+ <input type="date" name="dateEmbauche" id="dateEmbauche" required/><br><br>   
+<input type="submit"/>
+</form>
+
+</div>
+
+<!--<script>
+
+function action(){
+  alert("Formulaire a bien été envoyé ! merci de votre confiance.");
+}
+</script>-->
+
 @endsection

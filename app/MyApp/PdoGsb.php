@@ -34,13 +34,33 @@ class PdoGsb{
  * @param $mdp
  * @return l'id, le nom et le prénom sous la forme d'un tableau associatif 
 */
-	public function getInfosVisiteur($login, $mdp){
-		$req = "select visiteur.id as id, visiteur.nom as nom, visiteur.prenom as prenom from visiteur 
-        where visiteur.login='" . $login . "' and visiteur.mdp='" . $mdp ."'";
-    	$rs = $this->monPdo->query($req);
-		$ligne = $rs->fetch();
-		return $ligne;
-	}
+public function getInfosGestionnaire($login, $mdp) {
+    $req = "SELECT gestionnaire.id as id, gestionnaire.nom as nom, gestionnaire.prenom as prenom FROM gestionnaire WHERE gestionnaire.login = :login AND gestionnaire.mdp = :mdp";
+    
+    $stmt = $this->monPdo->prepare($req);
+    $stmt->bindParam(':login', $login);
+    $stmt->bindParam(':mdp', $mdp);
+    $stmt->execute();
+    
+    $ligne = $stmt->fetch();
+    return $ligne;
+}
+
+
+public function getInfosVisiteur($login, $mdp,) {
+    $req = "SELECT visiteur.id as id, visiteur.nom as nom, visiteur.prenom as prenom FROM visiteur WHERE visiteur.login = :login AND visiteur.mdp = :mdp";
+    
+    $stmt = $this->monPdo->prepare($req);
+    $stmt->bindParam(':login', $login);
+    $stmt->bindParam(':mdp', $mdp);
+    $stmt->execute();
+    
+    $ligne = $stmt->fetch();
+    return $ligne;
+
+
+
+}
 
 
 
@@ -52,16 +72,23 @@ class PdoGsb{
  * @param $mois sous la forme aaaamm
  * @return l'id, le libelle et la quantité sous la forme d'un tableau associatif 
 */
-	public function getLesFraisForfait($idVisiteur, $mois){
-		$req = "select fraisforfait.id as idfrais, fraisforfait.libelle as libelle, 
-		lignefraisforfait.quantite as quantite from lignefraisforfait inner join fraisforfait 
-		on fraisforfait.id = lignefraisforfait.idfraisforfait
-		where lignefraisforfait.idvisiteur ='$idVisiteur' and lignefraisforfait.mois='$mois' 
-		order by lignefraisforfait.idfraisforfait";	
-		$res = $this->monPdo->query($req);
-		$lesLignes = $res->fetchAll();
-		return $lesLignes; 
-	}
+public function getLesFraisForfait($idVisiteur, $mois) {
+    $req = "SELECT fraisforfait.id as idfrais, fraisforfait.libelle as libelle, 
+            lignefraisforfait.quantite as quantite 
+            FROM lignefraisforfait 
+            INNER JOIN fraisforfait ON fraisforfait.id = lignefraisforfait.idfraisforfait
+            WHERE lignefraisforfait.idvisiteur = :idVisiteur AND lignefraisforfait.mois = :mois
+            ORDER BY lignefraisforfait.idfraisforfait";
+
+    $stmt = $this->monPdo->prepare($req);
+    $stmt->bindParam(':idVisiteur', $idVisiteur);
+    $stmt->bindParam(':mois', $mois);
+    $stmt->execute();
+
+    $ligne = $stmt->fetchAll();
+    return $ligne;
+}
+
 /**
  * Retourne tous les id de la table FraisForfait
  
@@ -86,6 +113,7 @@ class PdoGsb{
 */
 	public function majFraisForfait($idVisiteur, $mois, $lesFrais){
 		$lesCles = array_keys($lesFrais);
+
 		foreach($lesCles as $unIdFrais){
 			$qte = $lesFrais[$unIdFrais];
 			$req = "update lignefraisforfait set lignefraisforfait.quantite = $qte
@@ -197,6 +225,18 @@ class PdoGsb{
 		$laLigne = $res->fetch();
 		return $laLigne;
 	}
+
+	public function getListeVisiteur()
+{
+    $req = "SELECT id, nom, prenom FROM visiteur";
+    $res = $this->monPdo->prepare($req);
+    $res->execute();
+    $ligne = $res->fetchAll();
+
+    return $ligne;
+}
+
+
 /**
  * Modifie l'état et la date de modification d'une fiche de frais
  
@@ -204,26 +244,130 @@ class PdoGsb{
  * @param $idVisiteur 
  * @param $mois sous la forme aaaamm
  */
- 
+/*function genererId() {
+    return chr(rand(97, 122)) . rand(10, 99);
+}*/
+
 	public function majEtatFicheFrais($idVisiteur,$mois,$etat){
 		$req = "update ficheFrais set idEtat = '$etat', dateModif = now() 
 		where fichefrais.idvisiteur ='$idVisiteur' and fichefrais.mois = '$mois'";
 		$this->monPdo->exec($req);
 	}
+	public function getAjouterVisiteur($id,$nom, $prenom, $login, $mdp, $adresse, $cp, $ville, $dateEmbauche)
+	{	
+		if (empty($id)) {
+			$id = chr(rand(97, 122)) . str_pad(rand(0, 99), 2, '0', STR_PAD_LEFT);
+		}
+	
+		$req = "INSERT INTO visiteur (id,nom, prenom, login, mdp, adresse, cp, ville, dateEmbauche) VALUES (:idVisiteur,:nom, :prenom, :login, :mdp, :adresse, :cp, :ville, :dateEmbauche) 
+		ON DUPLICATE KEY UPDATE id = :idVisiteur, nom = :nom, prenom = :prenom, login=:login, mdp = :mdp, adresse = :adresse, cp = :cp, ville = :ville, dateEmbauche = :dateEmbauche";
+	
+		$rs = $this->monPdo->prepare($req);
+		
+		
+		$rs->bindValue(':idVisiteur', $id);
 
-	public function listeVisiteurs(){
-		$req = "SELECT nom, prenom FROM visiteur";
-		$res = $this->monPdo->query($req);
-		$laLigne = $res->fetchAll();
-		return $laLigne;
-	} 
+		$rs->bindValue(':nom', $nom);
+	
+		$rs->bindValue(':prenom', $prenom);
+	
+		$rs->bindValue(':login', $login);
+	
+		$rs->bindValue(':mdp', $mdp);
+	
+		$rs->bindValue(':adresse', $adresse);
+	
+		$rs->bindValue(':cp', $cp);
+	
+		$rs->bindValue(':ville', $ville);
+	
+		$rs->bindValue(':dateEmbauche', $dateEmbauche);
 
-	public function ajouterUnVisiteur($id,$nom,$prenom,$log,$adresse,$cp,$ville,$dateEmbauche){
-		$req = "INSERT into visiteur (id,nom,prenom,login,adresse,cp,ville,dateembauche) values ('$id','$nom','$prenom','$log','$adresse','$cp','$ville','$dateEmbauche')";
-		$this->monPdo->exec($req);
 
+		$ligne = $rs->execute();
+	
+		return $ligne;
+	}
+	
+	 public function getModifierVisiteurs($id,$nom, $prenom, $login, $mdp, $adresse, $cp, $ville, $dateEmbauche) {
+		$req = "UPDATE visiteur SET nom = :nom, prenom = :prenom, login=:login, mdp = :mdp, adresse = :adresse, cp = :cp, ville = :ville, dateEmbauche = :dateEmbauche WHERE id = :id";
+		//echo($nom."-".$prenom."-".$login."-".$mdp."-".$adresse."-". $cp."-".$ville."-".$dateEmbauche."-".$id);
+		$stmt = $this->monPdo->prepare($req);
+		
+		$stmt->bindParam(':id', $id, PDO::PARAM_STR);
+		//var_dump($id);
+		$stmt->bindParam(':nom', $nom, PDO::PARAM_STR);
+		//ar_dump($nom);
+		
+		$stmt->bindParam(':prenom', $prenom, PDO::PARAM_STR);
+		//var_dump($prenom);
+
+		$stmt->bindParam(':login', $login, PDO::PARAM_STR);
+		//var_dump($login);
+
+		$stmt->bindParam(':mdp', $mdp, PDO::PARAM_STR);
+		//var_dump($mdp);
+
+		$stmt->bindParam(':adresse', $adresse, PDO::PARAM_STR);
+		//var_dump($adresse);
+
+		$stmt->bindParam(':cp', $cp, PDO::PARAM_INT);
+		//var_dump($cp);
+
+		$stmt->bindParam(':ville', $ville, PDO::PARAM_STR);
+		//var_dump($ville);
+
+		$stmt->bindParam(':dateEmbauche', $dateEmbauche,PDO::PARAM_STR);
+		//var_dump($dateEmbauche);*/
+
+
+		$ligne = $stmt->execute();
+		//var_dump($req);
+		return $ligne;
+	}
+	
+	
+
+	public function getInfoVisiteur($id)
+	{
+		$req ="SELECT * FROM visiteur WHERE id = :id";
+		$stmt = $this->monPdo->prepare($req);
+		$stmt->bindParam(':id', $id);
+		$stmt->execute();
+		return $stmt->fetch(PDO::FETCH_ASSOC); 
 	}
 
+	public function getSupprimerVisiteur($id){
+		$req = "DELETE FROM visiteur where id=:id";
+		$rs = $this->monPdo->prepare($req);
+		$rs->bindParam(':id', $id);
+		$rs->execute();
+		
+	}
+
+	public function supprimerFichesFraisVisiteur($idVisiteur)
+{	
+	  // Supprimer les lignes de frais associées au visiteur
+	  $reqLigneFrais = "DELETE FROM lignefraisforfait WHERE idVisiteur = :idVisiteur";
+	  $rsLigneFrais = $this->monPdo->prepare($reqLigneFrais);
+	  $rsLigneFrais->bindParam(':idVisiteur', $idVisiteur);
+	  $rsLigneFrais->execute();
+  
+    $req = "DELETE FROM fichefrais WHERE idVisiteur = :idVisiteur";
+    $rs = $this->monPdo->prepare($req);
+    $rs->bindParam(':idVisiteur', $idVisiteur);
+    $rs->execute();
+}
+
+	/*public function getModifierVisiteurs($id,$nom,$prenom,$login,$mdp,$adresse,$cp,$ville,$dateEmbauche)
+	{
+		$req="UPDATE visiteur SET nom=:nom, prenom=:prenom,login=:login,mdp=:mdp,adresse=:adresse,cp=:cp,ville=:ville,dateEmbauche=:dateEmbauche
+		WHERE id=:id";
+		$rs = $this->monPdo->prepare($req);
+		$ligne = $rs->fetchAll();
+		return $ligne;
+
+	}*/
 
 
 

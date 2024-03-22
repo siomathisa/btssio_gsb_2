@@ -164,6 +164,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         App\Providers\MyAppServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -197,7 +198,7 @@ return [
     |
     */
 
-    'aliases' => [
+    'aliases' => Barryvdh\DomPDF\Facade\Pdf::defaultAliases()->merge([
 
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
@@ -234,9 +235,13 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'PdoGsb' => App\Facades\PdoGsb::class,
         'MyDate' => App\Facades\MyDate::class,
-        'MyApp' => App\Facades\MyApp::class
+        'MyApp' => App\Facades\MyApp::class,
+        'PDF' => Barryvdh\DomPDF\Facade\PDF::class,
+        
         
        
-    ],
+    ])->toArray(),
 
+   
+    
 ];

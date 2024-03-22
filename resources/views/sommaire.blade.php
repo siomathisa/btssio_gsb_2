@@ -19,7 +19,7 @@
                   </li>
 
                   <li class="smenu">
-                    <a href="{{ route('chemin_gestionVisiteur') }}" title="Gestion des visiteurs">Gérer les visiteurs</a>
+                    <a href="{{ route('chemin_gererVisiteur') }}" title="Gérer visiteur">Gérer les visiteurs </a>
                   </li>
 
                <li class="smenu">

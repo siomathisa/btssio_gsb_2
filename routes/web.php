@@ -16,6 +16,7 @@ Route::get('/',[
         'uses' => 'connexionController@connecter'
 ]);
 
+
 Route::post('/',[
         'as'=>'chemin_valider',
         'uses'=>'connexionController@valider'
@@ -24,6 +25,22 @@ Route::get('deconnexion',[
         'as'=>'chemin_deconnexion',
         'uses'=>'connexionController@deconnecter'
 ]);
+        /*-------------------- gestionnaire case connexion---------------------------*/
+        Route::get('/',[
+                'as' => 'chemin_connexionG',
+                'uses' => 'connexionControllerG@connecterG'
+        ]);
+        
+        
+        Route::post('/',[
+                'as'=>'chemin_validerG',
+                'uses'=>'connexionControllerG@validerG'
+        ]);
+        Route::get('deconnexion',[
+                'as'=>'chemin_deconnexionG',
+                'uses'=>'connexionControllerG@deconnecterG'
+        ]);
+
 
          /*-------------------- Use case état des frais---------------------------*/
 Route::get('selectionMois',[
@@ -48,15 +65,49 @@ Route::post('sauvegarderFrais',[
         'uses'=>'gererFraisController@sauvegarderFrais'
 ]);
 
-Route::get('gestionVisiteur',[
-        'as'=>'chemin_gestionVisiteur',
-        'uses'=>'gestionVisiteurController@gererVisiteur'
+Route::any('gererVisiteur', [
+        'as' => 'chemin_gererVisiteur',
+        'uses' => 'gererLesVisiteurs@afficherVisiteur'
+    ]);
+    
+Route::get('infoVisiteur', [
+        'as' => 'chemin_infoVisiteur',
+        'uses' => 'gererLesVisiteurs@infoVisiteur'
+]);
+Route::get('ajouterVisiteur',[
+        'as'=>'chemin_ajout',
+        'uses'=>'gererLesVisiteurs@nouveauVisiteur'
 ]);
 
-Route::post('ajoutVisiteur',[
-        'as'=>'chemin_ajoutVisiteur',
-        'uses'=>'gestionVisiteurController@ajouterVisiteur'
+Route::post('ajouterVisiteur',[
+        'as'=>'chemin_ajouterVisiteur',
+        'uses'=>'gererLesVisiteurs@ajouterVisiteur'
+]);
+
+Route::get('modifierVisiteur',[
+        'as' =>'chemin_modifierVisiteur',
+        'uses' => 'gererLesVisiteurs@infoVisiteur'
 ]);
 
 
+
+Route::post('modifierVisiteur',[
+        'as' =>'chemin_modifier',
+        'uses' => 'gererLesVisiteurs@modifierVisiteur'
+]);
+
+Route::post('supprimerVisiteur', [
+        'as' =>'chemin_supprimerVisiteur',
+        'uses' => 'gererLesVisiteurs@supprimerVisiteur'
+]);
+
+Route::get('supprimerVisiteur', [
+        'as' =>'chemin_supprimer',
+        'uses' => 'gererLesVisiteurs@supprimer'
+]);
+
+Route::get('genererPdf',[
+        'as' =>'chemin_genererPdf',
+        'uses'=>'gererLesVisiteurs@genererPdfListeVisiteur'
+]);
 
